@@ -20,7 +20,7 @@ const menuItems = [
 
 const MenuItem: React.FC<{ image: string; label: string; onClick: () => void }> = ({ image, label, onClick }) => (
   <div className="flex flex-col items-center space-y-2">
-    {/* ===== ¡LOS CAMBIOS ESTÁN AQUÍ! ===== */}
+   
     <button 
       onClick={onClick} 
       className="w-16 h-16 bg-icon-bg rounded-2xl flex items-center justify-center shadow-sm 
