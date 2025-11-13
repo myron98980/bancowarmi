@@ -1,6 +1,6 @@
 import React from 'react';
 
-// Tu patrón de fondo personalizado
+
 const cardPattern = `url("data:image/svg+xml,%3Csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 8 L15 13 L9 13 Z' fill='%23FFF' fill-opacity='0.08'/%3E%3C/svg%3E")`;
 
 const BalanceCard: React.FC = () => {
