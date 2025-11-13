@@ -2,7 +2,7 @@
 import React from 'react';
 import QRCode from "react-qr-code";
 
-// 1. Importa ambas imágenes: el preview de la app y el nuevo fondo
+
 import appPreview from '../assets/app-preview.png';
 import desktopBackground from '../assets/desktop-background.png';
 
@@ -40,7 +40,7 @@ const DesktopLanding: React.FC = () => {
           </div>
         </div>
 
-        {/* ===== SECCIÓN DERECHA (ACTUALIZADA CON FONDO) ===== */}
+      
         <div className="relative flex justify-center items-center p-4">
           {/* 2. La imagen de fondo, posicionada absolutamente detrás */}
           <img 
@@ -49,7 +49,7 @@ const DesktopLanding: React.FC = () => {
             className="absolute inset-0 w-full h-full object-cover rounded-3xl"
           />
           
-          {/* 3. El preview de la app, posicionado de forma relativa para que quede por encima */}
+         
           <img 
             src={appPreview} 
             alt="App Preview" 
