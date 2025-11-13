@@ -1,5 +1,5 @@
 import React from 'react';
-// Importa la imagen del logo que acabas de guardar
+
 import logo from '../assets/logo-splash.png'; 
 
 const SplashScreen: React.FC = () => {
