@@ -100,6 +100,11 @@ const App: React.FC = () => {
   const handleMenuClick = () => { 
     setView('placeholder'); 
   };
+  // Vuelve a la pantalla de inicio desde una sub-pantalla
+const handleBackToHome = () => { 
+  setView('home'); 
+  setActiveNav('Inicio'); 
+};
 
   // --- Lógica de Renderizado Principal ---
 
@@ -142,7 +147,7 @@ const App: React.FC = () => {
               <RecentMovements />
             </>
           ) : (
-            <PlaceholderContent />
+           <PlaceholderContent onClose={handleBackToHome} />
           )}
         </main>
         
