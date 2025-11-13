@@ -59,11 +59,11 @@ const App: React.FC = () => {
   };
   
   // --- Lógica de Cierre de Sesión por Inactividad ---
-  // NUEVO: Define el tiempo de espera en milisegundos.
+  // Define el tiempo de espera en milisegundos.
   // 15 minutos = 15 * 60 segundos * 1000 milisegundos
   const INACTIVITY_TIMEOUT = 15 * 60 * 1000; 
 
-  // NUEVO: Llama al hook personalizado.
+  // Llama al hook personalizado.
   // Se le pasa la función que debe ejecutar (handleLogout) y el tiempo de espera.
   // Este hook se encargará de resetear el temporizador con la actividad del usuario.
   useInactivityTimeout(handleLogout, INACTIVITY_TIMEOUT);
