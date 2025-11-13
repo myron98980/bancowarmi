@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-// ===== ¡DISEÑO RESTAURADO AQUÍ! =====
-// Sub-componente para cada unidad de tiempo, con el texto DENTRO del círculo.
+
 const CountdownUnit: React.FC<{ value: number; unit: string }> = ({ value, unit }) => (
   <div className="flex flex-col items-center text-center">
     <div className="w-16 h-16 bg-countdown-bg rounded-full flex flex-col items-center justify-center">
@@ -50,7 +49,7 @@ const NextMeeting: React.FC = () => {
 
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
-  // --- Lógica del contador (corregida con setInterval) ---
+  // --- Lógica del contador 
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
