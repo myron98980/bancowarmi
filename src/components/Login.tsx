@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // 1. Se añade 'useEffect'
+import React, { useState, useEffect } from 'react'; // 
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 
@@ -13,7 +13,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  // 2. NUEVO: Este efecto se ejecuta una vez al cargar la página de login
+
   useEffect(() => {
     console.log('Firebase API Key:', import.meta.env.VITE_FIREBASE_API_KEY);
     // Busca si hay un usuario guardado en el almacenamiento local del navegador
@@ -33,7 +33,7 @@ const Login: React.FC = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
 
-      // 3. NUEVO: Si el login es exitoso, guarda el nombre de usuario
+      
       localStorage.setItem('rememberedUser', username);
 
     } catch (err) {
