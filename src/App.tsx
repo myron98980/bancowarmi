@@ -1,3 +1,5 @@
+// src/App.tsx
+
 import React, { useState, useEffect } from 'react';
 import { onAuthStateChanged, signOut, updateProfile, type User } from 'firebase/auth';
 import { auth, storage, db } from './firebase';
@@ -13,7 +15,7 @@ import Menu from './components/Menu';
 import NextMeeting from './components/NextMeeting';
 import RecentMovements from './components/RecentMovements';
 import BottomNav from './components/BottomNav';
-import PlaceholderContent from './components/PlaceholderContent';
+import PlaceholderContent from './components/PlaceholderContent'; // ✅ Mantenemos la importación
 import ProfileMenu from './components/ProfileMenu';
 import DesktopLanding from './components/DesktopLanding'; 
 
@@ -30,7 +32,7 @@ const App: React.FC = () => {
   const [showInitialSplash, setShowInitialSplash] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
-  const [view, setView] = useState<'home' | 'placeholder'>('home');
+  const [view, setView] = useState<'home' | 'placeholder'>('home'); // ✅ Mantenemos el estado de vista
   const [activeNav, setActiveNav] = useState('Inicio');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -67,7 +69,6 @@ const App: React.FC = () => {
   useInactivityTimeout(handleLogout, INACTIVITY_TIMEOUT);
   // ---------------------------------------------------
 
-
   // Maneja la subida y actualización de la foto de perfil
   const handlePhotoChange = async (file: File) => {
     if (!user) return;
@@ -85,12 +86,9 @@ const App: React.FC = () => {
       setIsMenuOpen(false);
     }
   };
-  
+
   // Vuelve a la pantalla de inicio desde una sub-pantalla
-  const handleBackToHome = () => { 
-    setView('home'); 
-    setActiveNav('Inicio'); 
-  };
+
 
   // Maneja los clics en la barra de navegación inferior
   const handleNavClick = (itemName: string) => { 
@@ -126,18 +124,16 @@ const App: React.FC = () => {
   // El hook de inactividad estará escuchando eventos.
   return (
     <>
-      <div 
-        className="max-w-md mx-auto min-h-screen pb-20"
-        style={{ background: 'linear-gradient(to bottom, #E6F7FF 0%, #FFFFFF 30%)' }}
-      >
+     <div className="max-w-md mx-auto min-h-screen pb-20 bg-white">
+        {/* Nuevo Header sin botón de atrás */}
         <Header 
-          view={view} 
           user={user} 
-          onBackClick={handleBackToHome}
           onAvatarClick={() => setIsMenuOpen(true)}
+          onNotificationClick={() => {}}
+        
         />
 
-        <main>
+       <main className="mt-4">
           {view === 'home' ? (
             <>
               <BalanceCard />
