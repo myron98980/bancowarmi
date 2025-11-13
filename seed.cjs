@@ -1,23 +1,9 @@
 // seed.cjs
 const admin = require('firebase-admin');
-
-// =============================================================
-// INICIO DE LA MODIFICACIÓN SEGURA
-// =============================================================
-
-// 1. Requiere el paquete 'dotenv' para leer el archivo .env.local
 require('dotenv').config({ path: '.env.local' });
-
-// 2. LÍNEA INSEGURA (la borramos):
-// const serviceAccount = require('./serviceAccountKey.json');
-
-// 3. NUEVA LÍNEA SEGURA:
 //    Lee la variable de entorno (que es un string) y la convierte en un objeto JSON.
 const serviceAccount = JSON.parse(process.env.VITE_FIREBASE_SERVICE_ACCOUNT_JSON);
 
-// =============================================================
-// FIN DE LA MODIFICACIÓN SEGURA
-// =============================================================
 
 
 admin.initializeApp({
@@ -28,7 +14,6 @@ const db = admin.firestore();
 const auth = admin.auth();
 
 const socias = [
-    // ... (tu lista de socias permanece exactamente igual)
     { nombre: "LUZ PERALTA", acciones: 10, pagar: 100 },
     { nombre: "GLORIA QUISPE", acciones: 5, pagar: 50 },
     { nombre: "NICOLE CAMPOS", acciones: 3, pagar: 30 },
