@@ -34,7 +34,7 @@ const BalanceCard: React.FC = () => {
   return (
     <div 
       className="bg-brand-purple rounded-2xl p-5 mx-4 text-white shadow-lg relative overflow-hidden"
-      // Tus estilos de fondo personalizados se mantienen
+     
       style={{ 
         backgroundImage: cardPattern,
         backgroundSize: '24px 24px',
@@ -44,12 +44,12 @@ const BalanceCard: React.FC = () => {
       <div className="relative z-10">
         <p className="text-sm font-medium opacity-90">Mis Aportes Acumulados</p>
         
-        {/* ===== CAMBIO 1: MONTO ACTUALIZADO A CERO ===== */}
+      
         <p className="text-4xl font-extrabold mt-2 tracking-tight">S/ 0.00</p>
         
         <div className="flex justify-between items-center mt-4">
           
-          {/* ===== CAMBIO 2: FECHA DINÁMICA ===== */}
+          
           <p className="text-xs opacity-80">{getLatestMeetingDate()}</p>
           
       <button className="bg-brand-pink text-white text-xs font-bold py-2.5 px-5 rounded-full 
