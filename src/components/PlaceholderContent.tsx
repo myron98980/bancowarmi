@@ -4,7 +4,7 @@ import React from 'react';
 import updateIcon from '../assets/update.png';
 
 interface PlaceholderContentProps {
-  onClose: () => void; // Nueva prop para cerrar la vista
+  onClose: () => void; 
 }
 
 const PlaceholderContent: React.FC<PlaceholderContentProps> = ({ onClose }) => {
