@@ -6,7 +6,7 @@ import avatarGirl from '../assets/avatar-girl.png';
 import avatarMen from '../assets/avatar-men.png';
 import { BellIcon } from '@heroicons/react/24/outline';
 
-// Ícono de notificación (versión limpia y moderna)
+
 const NotificationIcon = () => (
   <BellIcon className="h-5 w-5 text-white" />
 );
