@@ -25,3 +25,4 @@ dist-ssr
 
 # Local Environment Variables
 .env.local
+serviceAccountKey.json

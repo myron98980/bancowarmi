@@ -1,5 +1,3 @@
-// src/components/Menu.tsx
-
 import React from 'react';
 
 import martilloImg from '../assets/icons/martillo.png';
@@ -7,8 +5,9 @@ import calendarImg from '../assets/icons/calendar.png';
 import prestamosImg from '../assets/icons/prestamos.png';
 import gananciasImg from '../assets/icons/ganancias.png';
 
+// 1. La interfaz de props ahora espera recibir el 'label' del ítem como un string.
 interface MenuProps {
-  onItemClick: () => void;
+  onItemClick: (label: string) => void;
 }
 
 const menuItems = [
@@ -20,11 +19,9 @@ const menuItems = [
 
 const MenuItem: React.FC<{ image: string; label: string; onClick: () => void }> = ({ image, label, onClick }) => (
   <div className="flex flex-col items-center space-y-2">
-    {/* ===== ¡LOS CAMBIOS ESTÁN AQUÍ! ===== */}
     <button 
       onClick={onClick} 
-      className="w-16 h-16 bg-icon-bg rounded-2xl flex items-center justify-center shadow-sm 
-                 transition-transform duration-150 transform hover:scale-105 active:scale-95"
+      className="w-16 h-16 bg-icon-bg rounded-2xl flex items-center justify-center shadow-sm transition-transform duration-150 transform hover:scale-105 active:scale-95"
     >
       <img 
         src={image} 
@@ -44,7 +41,8 @@ const Menu: React.FC<MenuProps> = ({ onItemClick }) => {
           key={item.label} 
           image={item.image} 
           label={item.label} 
-          onClick={onItemClick}
+          // 2. Al hacer clic, ahora se ejecuta la función onItemClick pasándole el 'label' del botón.
+          onClick={() => onItemClick(item.label)} 
         />
       ))}
     </div>

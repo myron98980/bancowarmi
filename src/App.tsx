@@ -1,168 +1,134 @@
 // src/App.tsx
-
 import React, { useState, useEffect } from 'react';
-import { onAuthStateChanged, signOut, updateProfile, type User } from 'firebase/auth';
-import { auth, storage, db } from './firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { doc, updateDoc } from 'firebase/firestore';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { onAuthStateChanged, type User } from 'firebase/auth';
+import { auth, db } from './firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
-// Imports de Componentes
+// Imports de Componentes y Páginas
 import Login from './components/Login';
 import SplashScreen from './components/SplashScreen';
-import Header from './components/Header';
-import BalanceCard from './components/BalanceCard';
-import Menu from './components/Menu';
-import NextMeeting from './components/NextMeeting';
-import RecentMovements from './components/RecentMovements';
-import BottomNav from './components/BottomNav';
-import PlaceholderContent from './components/PlaceholderContent'; // ✅ Mantenemos la importación
-import ProfileMenu from './components/ProfileMenu';
-import DesktopLanding from './components/DesktopLanding'; 
-
-// Importa los hooks personalizados
+import DesktopLanding from './components/DesktopLanding';
+import MainApp from './pages/MainApp';
+import AdminPanel from './pages/AdminPanel';
 import useIsMobile from './hooks/useIsMobile';
-// NUEVO: Importa el hook de inactividad
-import useInactivityTimeout from './hooks/useInactivityTimeout';
 
-const App: React.FC = () => {
-  // Hook para detectar si el dispositivo es móvil
-  const isMobile = useIsMobile();
-
-  // --- Estados de la Aplicación ---
-  const [showInitialSplash, setShowInitialSplash] = useState(true);
+// Componente interno para manejar la lógica de autenticación y redirección
+const AppContent: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
-  const [view, setView] = useState<'home' | 'placeholder'>('home'); // ✅ Mantenemos el estado de vista
-  const [activeNav, setActiveNav] = useState('Inicio');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
+  const location = useLocation();
 
-  // Efecto para manejar la autenticación y el splash screen inicial
+  console.log("AppContent renderizado. Estado actual - User:", !!user, "UserRole:", userRole, "isAuthChecking:", isAuthChecking, "isMobile:", isMobile, "Location:", location.pathname);
+
   useEffect(() => {
-    const splashTimer = setTimeout(() => { setShowInitialSplash(false); }, 3000);
-    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setIsAuthChecking(false);
+    console.log("useEffect de onAuthStateChanged montado o re-ejecutado.");
+
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      console.log("onAuthStateChanged disparado. currentUser:", currentUser);
+
+      if (currentUser) {
+        try {
+          console.log("Usuario detectado, buscando rol en Firestore para UID:", currentUser.uid);
+          // Obtiene el rol del usuario desde Firestore
+          const userDocRef = doc(db, 'socias', currentUser.uid);
+          const userDoc = await getDoc(userDocRef);
+          
+          console.log("Documento de usuario obtenido. Existe:", userDoc.exists());
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            const role = userData.rol || 'socio';
+            console.log("Rol obtenido de Firestore:", role, "Data completa:", userData);
+            setUserRole(role);
+          } else {
+            console.log("Documento de usuario NO existe en 'socias'. Asignando rol por defecto 'socio'.");
+            setUserRole('socio');
+          }
+          
+          setUser(currentUser);
+          setIsAuthChecking(false);
+          console.log("Estado actualizado - User:", !!currentUser, "UserRole:", userRole, "isAuthChecking: false");
+        } catch (error) {
+          console.error("Error obteniendo datos del usuario:", error);
+          setUserRole(null);
+          setUser(null);
+          setIsAuthChecking(false);
+        }
+      } else {
+        console.log("No hay usuario autenticado. Reiniciando estado.");
+        setUser(null);
+        setUserRole(null);
+        setIsAuthChecking(false);
+      }
     });
+
     return () => {
-      clearTimeout(splashTimer);
-      unsubscribeAuth();
+      console.log("useEffect de onAuthStateChanged desmontado. Cancelando suscripción.");
+      unsubscribe();
     };
-  }, []);
+  }, []); // El array vacío [] asegura que el efecto se ejecute solo una vez al montar el componente
 
-  // --- Funciones de Manejo de Eventos ---
-
-  // Cierra la sesión del usuario
-  const handleLogout = () => {
-    console.log("Cerrando sesión...");
-    signOut(auth);
-    setIsMenuOpen(false);
-  };
-  
-  // --- Lógica de Cierre de Sesión por Inactividad ---
-  // NUEVO: Define el tiempo de espera en milisegundos.
-  // 15 minutos = 15 * 60 segundos * 1000 milisegundos
-  const INACTIVITY_TIMEOUT = 15 * 60 * 1000; 
-
-  // NUEVO: Llama al hook personalizado.
-  // Se le pasa la función que debe ejecutar (handleLogout) y el tiempo de espera.
-  // Este hook se encargará de resetear el temporizador con la actividad del usuario.
-  useInactivityTimeout(handleLogout, INACTIVITY_TIMEOUT);
-  // ---------------------------------------------------
-
-  // Maneja la subida y actualización de la foto de perfil
-  const handlePhotoChange = async (file: File) => {
-    if (!user) return;
-    const storageRef = ref(storage, `profile_pictures/${user.uid}`);
-    try {
-      await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(storageRef);
-      await updateProfile(user, { photoURL: downloadURL });
-      const userDocRef = doc(db, 'socias', user.uid);
-      await updateDoc(userDocRef, { photoURL: downloadURL });
-      setUser(prevUser => prevUser ? { ...prevUser, photoURL: downloadURL } : null);
-    } catch (error) {
-      console.error("Error al subir la foto de perfil:", error);
-    } finally {
-      setIsMenuOpen(false);
-    }
-  };
-
-  // Vuelve a la pantalla de inicio desde una sub-pantalla
-
-
-  // Maneja los clics en la barra de navegación inferior
-  const handleNavClick = (itemName: string) => { 
-    setActiveNav(itemName); 
-    setView(itemName === 'Inicio' ? 'home' : 'placeholder'); 
-  };
-
-  // Maneja los clics en los botones del menú principal
-  const handleMenuClick = () => { 
-    setView('placeholder'); 
-  };
-  // Vuelve a la pantalla de inicio desde una sub-pantalla
-const handleBackToHome = () => { 
-  setView('home'); 
-  setActiveNav('Inicio'); 
-};
-
-  // --- Lógica de Renderizado Principal ---
-
-  // 1. Si el dispositivo no es móvil, muestra la página de aterrizaje y nada más.
-  if (!isMobile) {
-    return <DesktopLanding />;
-  }
-
-  // 2. Si es móvil, continúa con el flujo normal de la aplicación.
-  if (showInitialSplash || isAuthChecking) {
+  // Mientras se verifica la autenticación, muestra el splash screen
+  if (isAuthChecking) {
+    console.log("Renderizando SplashScreen porque isAuthChecking es true.");
     return <SplashScreen />;
   }
 
-  // Si no hay un usuario, se muestra la pantalla de Login.
-  // En este punto, el hook de inactividad no está "activo" porque el componente
-  // principal que lo contiene se desmonta y su efecto de limpieza se ejecuta.
-  if (!user) {
-    return <Login />;
+  // Lógica de redirección basada en estado de autenticación y rol
+  if (user) {
+    console.log("Usuario autenticado detectado. Evaluando rol...");
+    // Usuario autenticado
+    if (userRole === 'admin') {
+      console.log("userRole es 'admin'. Renderizando AdminPanel.");
+      // Redirige a AdminPanel si es admin
+      return <AdminPanel />;
+    } else {
+      console.log("userRole NO es 'admin' (es:", userRole, "). Evaluando dispositivo...");
+      // Usuario normal (socio)
+      if (isMobile) {
+        console.log("Es dispositivo móvil. Renderizando MainApp.");
+        // Si es móvil y está autenticado, va a MainApp
+        return <MainApp user={user} />;
+      } else {
+        console.log("Es dispositivo de escritorio. Renderizando DesktopLanding.");
+        // Si es PC y está autenticado como socio, va al landing desktop
+        return <DesktopLanding />;
+      }
+    }
+  } else {
+    console.log("Usuario NO autenticado. Evaluando ruta actual...");
+    // Usuario no autenticado
+    if (location.pathname.startsWith('/admin')) {
+      console.log("Ruta es '/admin' y usuario no autenticado. Renderizando Login.");
+      // Si intenta acceder al admin sin estar logueado, vuelve al login
+      return <Login />;
+    }
+
+    if (isMobile) {
+      console.log("Usuario no autenticado y es móvil. Renderizando Login.");
+      // Si es móvil y no está logueado, muestra login
+      return <Login />;
+    } else {
+      console.log("Usuario no autenticado y es escritorio. Renderizando DesktopLanding.");
+      // Si es PC y no está logueado, muestra landing desktop
+      return <DesktopLanding />;
+    }
   }
-  
-  // Si hay un usuario, se renderiza la aplicación principal.
-  // El hook de inactividad estará escuchando eventos.
+};
+
+// Componente principal de la aplicación
+const App: React.FC = () => {
+  console.log("Componente App renderizado.");
   return (
-    <>
-     <div className="max-w-md mx-auto min-h-screen pb-20 bg-white">
-        {/* Nuevo Header sin botón de atrás */}
-        <Header 
-          user={user} 
-          onAvatarClick={() => setIsMenuOpen(true)}
-          onNotificationClick={() => {}}
-        
-        />
-
-       <main className="mt-4">
-          {view === 'home' ? (
-            <>
-              <BalanceCard />
-              <Menu onItemClick={handleMenuClick} />
-              <NextMeeting />
-              <RecentMovements />
-            </>
-          ) : (
-           <PlaceholderContent onClose={handleBackToHome} />
-          )}
-        </main>
-        
-        <BottomNav activeItem={activeNav} onNavItemClick={handleNavClick} />
-      </div>
-
-      {isMenuOpen && (
-        <ProfileMenu 
-          onClose={() => setIsMenuOpen(false)} 
-          onLogout={handleLogout}
-          onPhotoChange={handlePhotoChange}
-        />
-      )}
-    </>
+    <BrowserRouter>
+      <Routes>
+        {/* La ruta '*' permite que AppContent maneje toda la lógica */}
+        <Route path="*" element={<AppContent />} />
+      </Routes>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;

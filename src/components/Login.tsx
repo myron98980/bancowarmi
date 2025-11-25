@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react'; // 1. Se añade 'useEffect'
+import React, { useState, useEffect } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
+
+// 1. IMPORTAMOS LAS HERRAMIENTAS DE NAVEGACIÓN
+import { useNavigate } from 'react-router-dom';
 
 import logo from '../assets/logo2.png'; 
 import fondoLogin from '../assets/fondo-login.png';
@@ -12,35 +15,41 @@ const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  
+  // 2. INICIALIZAMOS EL HOOK DE NAVEGACIÓN
+  const navigate = useNavigate();
 
-  // 2. NUEVO: Este efecto se ejecuta una vez al cargar la página de login
   useEffect(() => {
-    console.log('Firebase API Key:', import.meta.env.VITE_FIREBASE_API_KEY);
-    // Busca si hay un usuario guardado en el almacenamiento local del navegador
     const rememberedUser = localStorage.getItem('rememberedUser');
-    if (rememberedUser) {
-      // Si lo encuentra, lo pone en el campo de usuario automáticamente
-      setUsername(rememberedUser);
-    }
-  }, []); // El array vacío asegura que solo se ejecute al inicio
+    if (rememberedUser) { setUsername(rememberedUser); }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    const email = `${username.toLowerCase()}@bancowarmi.com`;
-
+    
+    let email: string;
+    
+    // 3. LÓGICA DE EMAIL CORREGIDA Y SIMPLIFICADA
+    // Ahora funciona tanto para 'admin' como para 'nombre.apellido'
+    email = `${username.toLowerCase()}@bancowarmi.com`;
+    
     try {
       await signInWithEmailAndPassword(auth, email, password);
-
-      // 3. NUEVO: Si el login es exitoso, guarda el nombre de usuario
       localStorage.setItem('rememberedUser', username);
+      
+      // 4. AÑADIMOS LA REDIRECCIÓN
+      // Después de un login exitoso, redirige a la página principal.
+      // App.tsx se encargará de llevar al admin al panel correcto.
+      navigate('/');
 
     } catch (err) {
       setError('Usuario o contraseña incorrectos.');
+      console.error("Firebase Auth Error:", err); // Muestra el error real en consola
     }
   };
 
+  // Tu JSX se mantiene 100% idéntico
   return (
     <div className="min-h-screen bg-white bg-cover bg-center" style={{ backgroundImage: `url(${fondoLogin})` }}>
       <div className="flex flex-col justify-center items-center h-screen p-4">
@@ -57,7 +66,7 @@ const Login: React.FC = () => {
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"> <UserIcon /> </div>
               <input
                 type="text"
-                placeholder="Usuario (ejm: maria.zevallos)"
+                placeholder="Usuario (ej: luz.peralta o admin)"
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
