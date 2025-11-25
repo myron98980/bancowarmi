@@ -16,7 +16,7 @@ const StatusIcon: React.FC<{ status: AsistenciaEstado }> = ({ status }) => {
   return <span>{status.toUpperCase()}</span>; // Placeholder simple
 };
 
-const AsistenciaScreen: React.FC<AsistenciaScreenProps> = ({ user, onBack }) => {
+const AsistenciaScreen: React.FC<AsistenciaScreenProps> = ({ user}) => {
   const [historial, setHistorial] = useState<{ fecha: Date, estado: AsistenciaEstado }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
